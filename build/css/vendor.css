@@ -6756,15 +6756,6 @@ button.close {
 }
 /*# sourceMappingURL=bootstrap.css.map */
 
-.btn {
-  margin-bottom: 20px;
-}
-
-#player1 {
-  color: green;
-}
-
-#player2 {
+#output {
   display: none;
-  color: purple;
 }

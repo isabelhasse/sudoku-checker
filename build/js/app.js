@@ -1,114 +1,61 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-function Player(totalScore, runningScore) {
-  this.totalScore = totalScore;
-  this.runningScore = runningScore;
+function Board(array) {
+  this.array = array;
 }
 
-function Game() {
-  this.whoseTurn = 1;
-  this.roll = 0;
-}
-
-var resetValues = function() {
-  player1.totalScore = 0;
-  player2.totalScore = 0;
-}
-
-var rollDice = function() {
-  return Math.floor((Math.random() * 6) + 1);
-}
-
-var nextPlayer = function(game) {
-  if (game.whoseTurn === 1) {
-    game.whoseTurn = 2;
-  } else {
-    game.whoseTurn = 1;
+Board.prototype.check9 = function(set) {
+  for(i=1;i<10;i++) {
+    if (!set.includes(i)) {
+      return false;
+    }
   }
 };
 
-Player.prototype.processRoll = function(game) {
-  roll = rollDice()
-  if (roll === 1) {
-    nextPlayer(game);
-    this.runningScore = 0;
-  } else {
-    this.runningScore += roll;
-  }
-}
+Board.prototype.isComplete = function() {
+  return this.array.length === 81;
+};
 
-Player.prototype.hold = function(game) {
-  this.totalScore += this.runningScore;
-  if (this.totalScore >= 100) {
-    alert("You are the winner!!!!");
-    resetValues();
+Board.prototype.rowsAndColumns = function() {
+  if(!this.isComplete()) {
+    return false;
   }
-  this.runningScore = 0;
-  nextPlayer(game);
-}
+  
+  for(j=0;j<9;j++) {
+    var column = [];
+    var row = [];
 
-exports.playerModule = Player;
-exports.gameModule = Game;
+    for(i=0;i<9;i++) {
+      column.push(this.array[ (i*9)+j ]);
+      row.push(this.array[ (j*9)+i ]);
+    }
+
+    if (this.check9(column) === false || this.check9(row) === false) {
+      return false;
+    }
+  }
+  return true;
+};
+
+exports.boardModule = Board;
 
 },{}],2:[function(require,module,exports){
-var Player = require('./../js/pig-dice.js').playerModule;
-var Game = require('./../js/pig-dice.js').gameModule;
+var Board = require('./../js/sudoku-checker.js').boardModule;
 
 $(document).ready(function(){
-  var player1 = new Player(0, 0, 0);
-  var player2 = new Player(0, 0, 0);
-
-  var game = new Game();
-
-  $("#total1").text(player1.totalScore);
-  $("#total2").text(player2.totalScore);
-
-  var displayTurn = function() {
-    $("#player1").slideToggle();
-    $("#player2").slideToggle();
-  };
-
-  var rollButton = function() {
-    if(game.whoseTurn === 1) {
-      player1.processRoll(game);
-      $("#running-score").text(player1.runningScore);
+  $("#sudoku").submit(function(event) {
+    event.preventDefault();
+    var inputtedArray = $("#array").val().split("");
+    var numbersArray = inputtedArray.map(function(number) {
+      return parseInt(number);
+    });
+    var inputtedBoard = new Board(numbersArray);
+    if(inputtedBoard.rowsAndColumns()) {
+      $("#not").text("");
     } else {
-      player2.processRoll(game);
-      $("#running-score").text(player2.runningScore);
+      $("#not").text("not ");
     }
-    if(roll === 1) {
-      displayTurn();
-    }
-    $("#roll-result").text(roll);
-  }
-
-  var holdButton = function() {
-    if(game.whoseTurn === 1) {
-      player1.hold(game);
-    } else {
-      player2.hold(game);
-    }
-    $("#total1").text(player1.totalScore);
-    $("#total2").text(player2.totalScore);
-    displayTurn();
-  }
-
-  $("#roll-dice").click(function() {
-    rollButton();
+    $("#output").show();
   });
-
-  $("#hold").click(function() {
-    holdButton();
-  });
-
-  $("#computer-turn").click(function() {
-    rollButton();
-    if (roll != 1) {
-      rollButton();
-    }
-    if (roll != 1) {
-      holdButton();
-    }
-  })
 });
 
-},{"./../js/pig-dice.js":1}]},{},[2]);
+},{"./../js/sudoku-checker.js":1}]},{},[2]);

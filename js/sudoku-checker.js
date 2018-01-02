@@ -1,6 +1,6 @@
 function Board(array) {
   this.array = array;
-};
+}
 
 Board.prototype.check9 = function(set) {
   for(i=1;i<10;i++) {
@@ -15,6 +15,10 @@ Board.prototype.isComplete = function() {
 };
 
 Board.prototype.rowsAndColumns = function() {
+  if(!this.isComplete()) {
+    return false;
+  }
+  
   for(j=0;j<9;j++) {
     var column = [];
     var row = [];
